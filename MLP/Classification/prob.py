@@ -45,6 +45,32 @@ def slow_exit():
 
 set_seed(args.seed)
 
+def get_prob_online(model, data_call, args):
+    model.eval()
+    prob = np.zeros([args.gt_rules, args.gt_rules])
+    total = np.zeros([args.gt_rules, 1])
+
+    with torch.no_grad():
+        for _ in range(1000):
+            data, label = data_call(1000, args.gt_rules, args.data_seed)
+            data = torch.Tensor(data).to(device)
+            label = torch.Tensor(label).to(device)
+            out, score = model(data)
+
+            op = data[:, 2:].detach().cpu().numpy()
+            score = score.detach().cpu().numpy()
+
+            for gt in range(args.gt_rules):
+                idx = op[:, gt] == 1
+                idx = np.reshape(idx, [-1])
+                total[gt, 0] += np.sum(idx)
+                prob[gt] += np.sum(score[idx,:], axis=0)
+
+    prob /= total
+    prob *= (1./ args.gt_rules)
+
+    return prob
+
 def get_prob():
     model.eval()
     prob = np.zeros([args.gt_rules, args.gt_rules])

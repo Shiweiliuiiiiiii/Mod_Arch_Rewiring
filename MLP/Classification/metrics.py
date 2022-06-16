@@ -46,6 +46,27 @@ def get_name(rules, model, enc_dim, dim, seed):
 
     return f'Logs/Data-Seed_{d}/GT_Rules_{rules}/{model}_{enc_dim}_{dim}_{rules}_{s}'
 
+def metrics_online(prob, rules):
+
+    prob = prob / np.sum(prob)
+
+    # Compute Collapse Metric
+    collapse = collapse_metric(prob, rules)
+    print(f'Collapse Metric: {collapse}')
+
+    # Compute Collapse Worst Metric
+    collapse_worst = collapse_metric_worse(prob, rules)
+    print(f'Collapse Worst Metric: {collapse_worst}')
+
+    # Compute Mutual Information
+    mi = mutual_info(prob)
+    print(f'Mutual Information: {mi}')
+
+    # Activation Probability
+    emp = emp_prob(prob)
+    emp = ' | '.join([str(x) for x in emp])
+    print(f'Empirical Probability: {emp}')
+
 def metrics(rules, model, enc_dim, dim, seed, ckpt='_last'):
     name = get_name(rules, model, enc_dim, dim, seed)
     print(name)

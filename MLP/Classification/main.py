@@ -14,6 +14,8 @@ import seaborn as sns
 
 from data import data_v1, data_v2
 from model import Monolithic, Modular, GT_Modular
+from prob import get_prob_online
+from metrics import metrics_online
 
 parser = argparse.ArgumentParser(description='Rule MLP')
 parser.add_argument('--gt-rules', type=int, default=2)
@@ -165,6 +167,12 @@ for i in range(1, args.iterations+1):
         df.index = df.index + 1
 
     train_loss, train_acc = train_step()
+
+
+    if i % 1000 == 0:
+        
+        prob = get_prob_online(model, data_call, args)
+        metrics_online(prob, args.num_rules)
 
     if i % 5000 == 0:
         if args.scheduler:
