@@ -198,6 +198,7 @@ for i in range(1, args.iterations+1):
         prob = get_prob_online(model, data_call, args)
         p = np.sum(prob, axis=0)
         idx = (p < 1/args.num_rules)
+        print(idx)
         # reinitialize/rewire weights of collapsed experts
         bound = math.sqrt(1.0/ (model.encoder_dim * 3))
 
