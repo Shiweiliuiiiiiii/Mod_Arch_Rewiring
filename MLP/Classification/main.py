@@ -217,6 +217,7 @@ for i in range(1, args.iterations+1):
             if 'MLP.2.w' in name1:
                 new_weights = torch.zeros_like(model_para[name1][p < 1 / args.num_rules]).to(model_para[name1].device)
                 nn.init.uniform_(new_weights, -bound, bound)
+                print([p < 1 / args.num_rules])
                 print(f'before {model_para[name1][p < 1 / args.num_rules]}')
                 model_para[name1][p < 1 / args.num_rules].data = new_weights.data
                 print(f'after {model_para[name1][p < 1 / args.num_rules]}')
