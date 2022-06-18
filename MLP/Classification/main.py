@@ -224,16 +224,16 @@ for i in range(1, args.iterations+1):
         #
         # set_model_params(model, model_para)
 
-
-        for name1, para in model.named_parameters():
-            if 'MLP.2.w' in name1:
-                # size of expert parameters - (num_modelars, dims/num_modelars, dims+1)
-                new_weights = torch.zeros_like(para[p < 1/args.num_rules]).to(para.device)
-                nn.init.uniform_(new_weights, -bound, bound)
-                print(new_weights)
-                print(f'before {para[p < 1/args.num_rules]}')
-                para[p < 1/args.num_rules].data[:] = new_weights
-                print(f'after {para[p < 1/args.num_rules]}')
+        with torch.no_grad():
+            for name1, para in model.named_parameters():
+                if 'MLP.2.w' in name1:
+                    # size of expert parameters - (num_modelars, dims/num_modelars, dims+1)
+                    new_weights = torch.zeros_like(para[p < 1/args.num_rules]).to(para.device)
+                    nn.init.uniform_(new_weights, -bound, bound)
+                    print(new_weights)
+                    print(f'before {para[p < 1/args.num_rules]}')
+                    para[p < 1/args.num_rules].copy(new_weights)
+                    print(f'after {para[p < 1/args.num_rules]}')
 
 
         # metrics_online(prob, args.num_rules)
