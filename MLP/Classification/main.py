@@ -130,7 +130,11 @@ def eval_step(ood=False, n_evals=10, rngs=None):
     total_acc = 0.
 
     with torch.no_grad():
-        rngs_batch = [] if not rngs else rngs,
+        if not rngs:
+            rngs_batch = []
+        else:
+            rngs_batch = rngs
+            
         for i in range(n_evals):
             if not rngs:
                 data, label, rng = data_call(args.batch_size, args.gt_rules, args.data_seed, ood)
