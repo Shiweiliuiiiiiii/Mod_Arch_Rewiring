@@ -211,18 +211,18 @@ for i in range(1, args.iterations+1):
         # reinitialize/rewire weights of collapsed experts
         bound = math.sqrt(1.0/ (model.encoder_dim * 3))
 
-        model_para = get_model_params(model)
-
-        for name1 in model_para:
-            if 'MLP.2.w' in name1:
-                new_weights = torch.zeros_like(model_para[name1][p < 1 / args.num_rules]).to(model_para[name1].device)
-                nn.init.uniform_(new_weights, -bound, bound)
-                print([p < 1 / args.num_rules])
-                print(f'before {model_para[name1][p < 1 / args.num_rules]}')
-                model_para[name1][p < 1 / args.num_rules].data = new_weights.data
-                print(f'after {model_para[name1][p < 1 / args.num_rules]}')
-
-        set_model_params(model, model_para)
+        # model_para = get_model_params(model)
+        #
+        # for name1 in model_para:
+        #     if 'MLP.2.w' in name1:
+        #         new_weights = torch.zeros_like(model_para[name1][p < 1 / args.num_rules]).to(model_para[name1].device)
+        #         nn.init.uniform_(new_weights, -bound, bound)
+        #         print([p < 1 / args.num_rules])
+        #         print(f'before {model_para[name1][p < 1 / args.num_rules]}')
+        #         model_para[name1][p < 1 / args.num_rules].data = new_weights.data
+        #         print(f'after {model_para[name1][p < 1 / args.num_rules]}')
+        #
+        # set_model_params(model, model_para)
 
 
         for name1, para in model.named_parameters():
@@ -232,7 +232,7 @@ for i in range(1, args.iterations+1):
                 nn.init.uniform_(new_weights, -bound, bound)
                 print(new_weights)
                 print(f'before {para[p < 1/args.num_rules]}')
-                para[p < 1/args.num_rules].data = new_weights.data
+                para[p < 1/args.num_rules].data[:] = new_weights
                 print(f'after {para[p < 1/args.num_rules]}')
 
 
