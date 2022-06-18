@@ -124,14 +124,19 @@ criterion = nn.BCEWithLogitsLoss()
 
 df = pd.DataFrame(columns=["Iterations", "Loss", "Accuracy"])
 
-def eval_step(ood=False, n_evals=10):
+def eval_step(ood=False, n_evals=10, rngs=None):
     model.eval()
     total_loss = 0.
     total_acc = 0.
 
     with torch.no_grad():
-        for _ in range(n_evals):
-            data, label = data_call(args.batch_size, args.gt_rules, args.data_seed, ood)
+        rngs_batch = [] if not rngs else rngs,
+        for i in range(n_evals):
+            if not rngs:
+                data, label, rng = data_call(args.batch_size, args.gt_rules, args.data_seed, ood)
+                rngs_batch.append(rng)
+            else:
+                data, label, rng = data_call(args.batch_size, args.gt_rules, args.data_seed, rngs_batch[i])
 
             data = torch.Tensor(data).to(device)
             label = torch.Tensor(label).to(device)
@@ -144,7 +149,7 @@ def eval_step(ood=False, n_evals=10):
             total_loss += loss.item()
             total_acc += acc.item()
 
-        return total_loss / float(n_evals), total_acc * 100. / float(n_evals)
+        return total_loss / float(n_evals), total_acc * 100. / float(n_evals), rngs_batch
 
 
 def train_step():
@@ -166,8 +171,8 @@ def train_step():
 
     return loss.item(), acc.item() * 100.
 
-eval_loss, eval_acc = eval_step()
-eval_ood_loss, eval_ood_acc = eval_step(True)
+eval_loss, eval_acc, _ = eval_step()
+eval_ood_loss, eval_ood_acc, _  = eval_step(ood=True)
 
 log = f'Iteration: 0 | Eval OoD Loss: {eval_ood_loss} - Eval OoD Acc: {eval_ood_acc} | \n' \
       f'Iteration: 0 | Train Loss: {eval_loss} - Train Acc: {eval_acc} | \n' \
@@ -184,8 +189,8 @@ df.index = df.index + 1
 
 for i in range(1, args.iterations+1):
     if i % 5000 == 0:
-        eval_loss, eval_acc = eval_step()
-        val_loss, val_acc = eval_step()
+        eval_loss, eval_acc, _ = eval_step()
+        val_loss, val_acc, _ = eval_step()
 
         df.loc[-1] = [i, eval_loss, eval_acc]
         df.index = df.index + 1
@@ -200,14 +205,14 @@ for i in range(1, args.iterations+1):
         idx = (p < 1/args.num_rules)
         # reinitialize/rewire weights of collapsed experts
         bound = math.sqrt(1.0/ (model.encoder_dim * 3))
-        eval_loss, eval_acc = eval_step()
+        eval_loss, eval_acc, rngs = eval_step()
         print(f'eval_loss before reini is {eval_loss}')
         # for name1, para in model.named_parameters():
         #     if name1 == 'MLP.2.b Parameter':
         #         # size of expert parameters - (num_modelars, dims/num_modelars, dims+1)
         #         nn.init.uniform_(para[idx], -bound, bound)
-        eval_loss, eval_acc = eval_step()
-        print(f'eval_loss after reini is {eval_loss}')
+        eval_loss_new, eval_acc_new, _ = eval_step(rngs=rngs)
+        print(f'eval_loss after reini is {eval_loss_new}')
 
 
         # metrics_online(prob, args.num_rules)

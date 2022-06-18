@@ -49,8 +49,8 @@ def data_v1(num_examples, num_rules=2, data_seed=None, ood=False, prob=None):
 
     return sample, result
 
-def data_v2(num_examples, num_rules, data_seed, ood=False, prob=None):
-    rng = np.random.RandomState(data_seed)
+def data_v2(num_examples, num_rules, data_seed, ood=False, prob=None, rng=None):
+    rng = np.random.RandomState(data_seed) if not rng else rng
     coeff1 = rng.randn(num_rules)
     coeff2 = rng.randn(num_rules)
 
@@ -75,7 +75,7 @@ def data_v2(num_examples, num_rules, data_seed, ood=False, prob=None):
     result = np.sum(result * task, axis=-1)
     sample = np.concatenate((a, b, task), axis=-1)
 
-    return sample, result
+    return sample, result, rng
 
 if __name__ == '__main__':
     sample, result = data_v1(10, 3)
