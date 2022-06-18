@@ -12,6 +12,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 import math
+import copy
 from data import data_v1, data_v2
 from model import Monolithic, Modular, GT_Modular
 
@@ -35,6 +36,15 @@ args = parser.parse_args()
 
 sns.color_palette("dark", as_cmap=True)
 sns.set(style="darkgrid")
+
+def get_model_params(model):
+    params = {}
+    for name in model.state_dict():
+        params[name] = copy.deepcopy(model.state_dict()[name])
+    return params
+
+def set_model_params(model, model_parameters):
+    model.load_state_dict(model_parameters)
 
 def get_prob_online(model, data_call, args):
     model.eval()
@@ -195,10 +205,24 @@ for i in range(1, args.iterations+1):
 
     if i % 1000 == 0:
 
+
         prob = get_prob_online(model, data_call, args)
         p = np.sum(prob, axis=0)
         # reinitialize/rewire weights of collapsed experts
         bound = math.sqrt(1.0/ (model.encoder_dim * 3))
+
+        model_para = get_model_params(model)
+
+        for name1 in model_para:
+            if 'MLP.2.w' in name1:
+                new_weights = torch.zeros_like(model_para[name1][p < 1 / args.num_rules]).to(model_para[name1].device)
+                nn.init.uniform_(new_weights, -bound, bound)
+                print(f'before {model_para[name1][p < 1 / args.num_rules]}')
+                model_para[name1][p < 1 / args.num_rules].data = new_weights.data
+                print(f'after {model_para[name1][p < 1 / args.num_rules]}')
+
+        set_model_params(model, model_para)
+
 
         for name1, para in model.named_parameters():
             if 'MLP.2.w' in name1:
