@@ -202,6 +202,7 @@ for i in range(1, args.iterations+1):
 
         for name1, para in model.named_parameters():
             if 'MLP.2.b' in name1:
+                print(para.shape)
                 # size of expert parameters - (num_modelars, dims/num_modelars, dims+1)
                 print(f'before {para}')
                 nn.init.uniform_(para[p < 1/args.num_rules], -bound, bound)
