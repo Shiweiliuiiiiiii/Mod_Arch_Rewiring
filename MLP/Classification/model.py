@@ -142,8 +142,8 @@ class Modular(nn.Module):
         sample = sample.unsqueeze(1).repeat(1, self.num_rules, 1)
 
         if self.joint:
+            # out - (batch, num_modulars, dim+1)
             out = self.MLP(sample)
-            print(out.shape)
             score = F.softmax(out[:,:,-1:], dim=1)
             out = out[:,:,:-1]
         else:
