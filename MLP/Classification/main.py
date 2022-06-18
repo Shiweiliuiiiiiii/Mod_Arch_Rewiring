@@ -205,6 +205,7 @@ for i in range(1, args.iterations+1):
                 # size of expert parameters - (num_modelars, dims/num_modelars, dims+1)
                 new_weights = torch.zeros_like(torch.from_numpy(p[p < 1/args.num_rules])).to(para.device)
                 nn.init.uniform_(new_weights, -bound, bound)
+                print(new_weights)
                 print(f'before {para[p < 1/args.num_rules]}')
                 para[p < 1/args.num_rules].data = new_weights.data
                 print(f'after {para[p < 1/args.num_rules]}')
