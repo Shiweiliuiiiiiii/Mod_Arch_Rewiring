@@ -143,6 +143,7 @@ class Modular(nn.Module):
 
         if self.joint:
             out = self.MLP(sample)
+            print(out.shape)
             score = F.softmax(out[:,:,-1:], dim=1)
             out = out[:,:,:-1]
         else:

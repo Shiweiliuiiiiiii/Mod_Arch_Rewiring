@@ -200,8 +200,6 @@ for i in range(1, args.iterations+1):
         idx = (p < 1/args.num_rules)
         # reinitialize/rewire weights of collapsed experts
         bound = math.sqrt(1.0/ (model.encoder_dim * 3))
-        for name, weight in model.named_parameters():
-            print(name, weight)
 
         # metrics_online(prob, args.num_rules)
 
