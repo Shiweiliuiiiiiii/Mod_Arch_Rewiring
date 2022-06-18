@@ -201,7 +201,7 @@ for i in range(1, args.iterations+1):
         bound = math.sqrt(1.0/ (model.encoder_dim * 3))
 
         for name1, para in model.named_parameters():
-            if 'MLP.2.b' in name1:
+            if 'MLP.2.w' in name1:
                 print(para.shape)
                 # size of expert parameters - (num_modelars, dims/num_modelars, dims+1)
                 print(f'before {para}')
