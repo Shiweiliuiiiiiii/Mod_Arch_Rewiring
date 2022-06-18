@@ -1,0 +1,1 @@
+python main.py --gt-rules 8 --data-seed 0 --model Modular --num-rules 8 --encoder-dim 64 --dim 128 --seed 0 --joint
