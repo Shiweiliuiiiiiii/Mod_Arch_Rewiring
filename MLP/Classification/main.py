@@ -197,8 +197,6 @@ for i in range(1, args.iterations+1):
 
         prob = get_prob_online(model, data_call, args)
         p = np.sum(prob, axis=0)
-        idx = (p < 1/args.num_rules)
-        print(idx)
         # reinitialize/rewire weights of collapsed experts
         bound = math.sqrt(1.0/ (model.encoder_dim * 3))
 
@@ -206,7 +204,7 @@ for i in range(1, args.iterations+1):
             if 'MLP.2.b' in name1:
                 # size of expert parameters - (num_modelars, dims/num_modelars, dims+1)
                 print(f'before {para}')
-                nn.init.uniform_(para[idx], -bound, bound)
+                nn.init.uniform_(para[p < 1/args.num_rules], -bound, bound)
                 print(f'after {para}')
 
 
