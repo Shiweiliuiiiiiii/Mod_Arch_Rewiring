@@ -134,7 +134,7 @@ def eval_step(ood=False, n_evals=10, rngs=None):
             rngs_batch = []
         else:
             rngs_batch = rngs
-            
+
         for i in range(n_evals):
             if not rngs:
                 data, label, rng = data_call(args.batch_size, args.gt_rules, args.data_seed, ood)
@@ -160,7 +160,7 @@ def train_step():
     model.train()
     model.zero_grad()
 
-    data, label = data_call(args.batch_size, args.gt_rules, args.data_seed)
+    data, label, _ = data_call(args.batch_size, args.gt_rules, args.data_seed)
 
     data = torch.Tensor(data).to(device)
     label = torch.Tensor(label).to(device)
@@ -204,11 +204,11 @@ for i in range(1, args.iterations+1):
 
     if i % 1000 == 0:
 
-        prob = get_prob_online(model, data_call, args)
-        p = np.sum(prob, axis=0)
-        idx = (p < 1/args.num_rules)
-        # reinitialize/rewire weights of collapsed experts
-        bound = math.sqrt(1.0/ (model.encoder_dim * 3))
+        # prob = get_prob_online(model, data_call, args)
+        # p = np.sum(prob, axis=0)
+        # idx = (p < 1/args.num_rules)
+        # # reinitialize/rewire weights of collapsed experts
+        # bound = math.sqrt(1.0/ (model.encoder_dim * 3))
         eval_loss, eval_acc, rngs = eval_step()
         print(f'eval_loss before reini is {eval_loss}')
         # for name1, para in model.named_parameters():
