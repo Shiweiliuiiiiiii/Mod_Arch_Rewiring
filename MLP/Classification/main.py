@@ -11,7 +11,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import math
 from data import data_v1, data_v2
 from model import Monolithic, Modular, GT_Modular
 from prob import get_prob_online
@@ -170,9 +170,16 @@ for i in range(1, args.iterations+1):
 
 
     if i % 1000 == 0:
-        
+
         prob = get_prob_online(model, data_call, args)
-        metrics_online(prob, args.num_rules)
+        p = np.sum(prob, axis=0)
+        idx = (p < 1/args.num_rules)
+        # reinitialize/rewire weights of collapsed experts
+        bound = math.sqrt(1.0/ (model.encoder_dim * 3))
+        for name, weight in model.named_parameters():
+            print(name, weight)
+
+        # metrics_online(prob, args.num_rules)
 
     if i % 5000 == 0:
         if args.scheduler:
