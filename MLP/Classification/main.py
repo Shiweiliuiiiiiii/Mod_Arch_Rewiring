@@ -206,9 +206,8 @@ for i in range(1, args.iterations+1):
                 new_weights = torch.zeros_like(torch.from_numpy(p[p < 1/args.num_rules])).to(para.device)
                 nn.init.uniform_(new_weights, -bound, bound)
                 print(f'before {para[p < 1/args.num_rules]}')
-                para[p < 1/args.num_rules].data = new_weights
+                para[p < 1/args.num_rules].data = new_weights.data
                 print(f'after {para[p < 1/args.num_rules]}')
-
 
 
         # metrics_online(prob, args.num_rules)
