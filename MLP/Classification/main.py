@@ -202,10 +202,10 @@ for i in range(1, args.iterations+1):
         bound = math.sqrt(1.0/ (model.encoder_dim * 3))
         eval_loss, eval_acc = eval_step()
         print(f'eval_loss before reini is {eval_loss}')
-        for name1, para in model.named_parameters():
-            if name1 == 'MLP.2.b Parameter':
-                # size of expert parameters - (num_modelars, dims/num_modelars, dims+1)
-                nn.init.uniform_(para[idx], -bound, bound)
+        # for name1, para in model.named_parameters():
+        #     if name1 == 'MLP.2.b Parameter':
+        #         # size of expert parameters - (num_modelars, dims/num_modelars, dims+1)
+        #         nn.init.uniform_(para[idx], -bound, bound)
         eval_loss, eval_acc = eval_step()
         print(f'eval_loss after reini is {eval_loss}')
 
