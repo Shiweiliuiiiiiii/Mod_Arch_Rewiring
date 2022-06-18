@@ -14,7 +14,6 @@ import seaborn as sns
 import math
 from data import data_v1, data_v2
 from model import Monolithic, Modular, GT_Modular
-from metrics import metrics_online
 
 parser = argparse.ArgumentParser(description='Rule MLP')
 parser.add_argument('--gt-rules', type=int, default=2)
