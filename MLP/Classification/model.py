@@ -112,7 +112,7 @@ class Modular(nn.Module):
             )
         else:
             self.MLP = nn.Sequential(
-                GroupLinearLayer(num_rules, encoder_dim * 3, dim // num_rules),
+                GroupLinearLayer(num_rules, encoder_dim * 3, dim ),
                 nn.ReLU(),
                 GroupLinearLayer(num_rules, dim // num_rules, dim)
             )
